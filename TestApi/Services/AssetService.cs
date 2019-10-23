@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Driver;
 using TestApi.Models;
+using TestApi.Config;
 
 namespace TestApi.Services
 {

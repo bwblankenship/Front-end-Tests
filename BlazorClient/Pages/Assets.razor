@@ -1,0 +1,40 @@
+@page "/"
+@include 
+<h1>Asset List</h1>
+
+@if(assets == null)
+{
+    <p>There are no assets in the db...</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th>Id</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var asset in assets)
+            {
+                <tr>
+                    <td>
+                        <button type="button" class="btn btn-primary px-3">
+                            <i class="oi oi-pencil"></i>
+                        </button>
+                    </td>
+                    <td>@asset.Id</td>
+                    <td>@asset.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<button><span class="oi oi-plus"></span>Add New Asset</button>
+
+@code{
+    private List<Asset> assets;
+}

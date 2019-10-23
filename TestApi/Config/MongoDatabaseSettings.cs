@@ -1,4 +1,4 @@
-namespace TestApi.Models
+namespace TestApi.Config
 {
     public class MongoDatabaseSettings : IMongoDatabaseSettings
     {
