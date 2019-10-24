@@ -36,9 +36,9 @@ namespace TestApi.Controllers
         [HttpPost]
         public ActionResult<Asset> Create(Asset asset)
         {
-            _assetService.CreateAsset(asset);
+            asset = _assetService.CreateAsset(asset);
 
-            return CreatedAtRoute("GetBook", new { id = asset.Id.ToString() }, asset);
+            return asset;            
         }
 
         [HttpPut("{id:length(24)}")]

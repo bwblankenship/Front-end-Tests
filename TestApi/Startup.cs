@@ -26,7 +26,10 @@ namespace TestApi
             {
                 options.AddPolicy(MyAllowSpecificOrigins, builder =>
                 {
-                    builder.WithOrigins("http://localhost:5000");
+                    builder /*.WithOrigins("http://localhost:5000")*/
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowAnyOrigin();
                 });
             });
 

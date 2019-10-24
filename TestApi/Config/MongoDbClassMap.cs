@@ -12,6 +12,7 @@ namespace TestApi.Config
             BsonClassMap.RegisterClassMap<Asset>(cm => 
             {
                 cm.MapIdMember(c => c.Id).SetSerializer(new StringSerializer(BsonType.ObjectId));
+                cm.AutoMap();
             });
 
             BsonClassMap.RegisterClassMap<StringData>().AutoMap();

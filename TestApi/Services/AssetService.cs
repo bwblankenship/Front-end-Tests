@@ -3,6 +3,7 @@ using System.Linq;
 using MongoDB.Driver;
 using TestApi.Models;
 using TestApi.Config;
+using MongoDB.Bson;
 
 namespace TestApi.Services
 {
@@ -25,6 +26,10 @@ namespace TestApi.Services
 
         public Asset CreateAsset(Asset asset) 
         {
+            if(asset.Id == null)
+            {
+                asset.Id = ObjectId.GenerateNewId().ToString();
+            }
             _assets.InsertOne(asset);
             return asset;
         }
