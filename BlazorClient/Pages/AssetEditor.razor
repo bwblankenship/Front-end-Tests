@@ -1,1 +1,129 @@
-@page "/editor"
+@page "/editor/{Id}"
+
+@using TestApi.Models
+@using System.Net.Http
+@using System.Linq
+@inject HttpClient Http
+
+<div class="container">
+    <div class="row">
+        <h1>Asset - @_asset?.Name</h1>
+    </div>
+
+    <div class="row">
+        @if(_asset?.Strings == null || !_asset.Strings.Any())
+        {
+            <p>There are no strings in this asset...</p>
+        }
+        else
+        {
+            <h2>Strings</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Id</th>
+                        <th scope="col">Text</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var stringItem in _asset.Strings)
+                    {
+                        <tr>
+                            <th scope="row">                                
+                                <button type="button btn-danger" class="btn btn-danger" @onclick="@(() => DeleteString(stringItem.StringId))">
+                                    <i class="oi oi-trash"></i>
+                                </button>
+                            </th>
+                            <td>@stringItem.StringId</td>
+                            <td>@stringItem.Text</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    @if(_isCreatingString)
+        {
+            <div class="row justify-content-start">
+                <label for="StringText" class="col-6">String Text</label>
+                <div class="w-100"></div>
+                <input type="text" id="StringText" placeholder="Text" class="col" @bind="_newStringText"/>
+            </div>
+            <div class="row justify-content-start">
+                <button class="btn btn-secondary col-md-2" @onclick="StopCreateString">Cancel</button>
+                <button class="btn btn-primary col-md-2 offset-md-1" @onclick="CreateString"><span class="oi oi-plus"> Add</span></button>
+            </div>   
+        }
+        else 
+        {
+            <div class="row justify-content-start">     
+                <button class="btn btn-primary col-md-3" @onclick="CreatingString"><span class="oi oi-plus"> Add New String</span></button>
+            </div>
+        }
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private string BaseApi = @"http://localhost:8000";
+    private Asset _asset;
+
+    private bool _isCreatingString = false;
+    private string _newStringText = string.Empty;
+
+    protected override async Task OnInitializedAsync() =>
+        await GetAsset(Id);
+
+    private void CreatingString() => _isCreatingString = true;
+    private void StopCreateString() 
+    {
+        _isCreatingString = false;
+        _newStringText = string.Empty;
+    }
+
+    private async Task GetAsset(string Id)
+    {
+        _asset = await Http.GetJsonAsync<Asset>($"{BaseApi}/api/Asset/{Id}");
+    }
+
+    private async Task CreateString()
+    {
+        if(!string.IsNullOrEmpty(_newStringText))
+        {
+            int nextId = 0;
+            if(_asset.Strings == null)
+            {
+                _asset.Strings = new List<StringData>();                
+            }
+
+            if(_asset.Strings.Any())
+            {
+                nextId = _asset.Strings.Select(s => s.StringId).Max() + 1;
+            }
+
+            var newString = new StringData 
+            {
+                StringId = nextId,
+                Text = _newStringText
+            };            
+
+            Console.WriteLine($"Creating new string: {{ Id: {newString.StringId}, Text: {newString.Text} }}");
+            _asset.Strings.Add(newString);
+            await Http.PutJsonAsync($"{BaseApi}/api/Asset/{Id}", _asset);
+            await GetAsset(Id);
+        }
+    }
+
+    private async Task DeleteString(int stringId) 
+    {
+        Console.WriteLine($"Deleting {stringId}...");
+        var stringDelete = _asset.Strings.FirstOrDefault(f => f.StringId == stringId);
+        _asset.Strings.Remove(stringDelete);
+        await Http.PutJsonAsync($"{BaseApi}/api/Asset/{Id}", _asset);
+        await GetAsset(Id);
+    }
+
+}

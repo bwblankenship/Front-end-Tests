@@ -1,40 +1,109 @@
 @page "/"
-@include 
-<h1>Asset List</h1>
+@using TestApi.Models
+@using System.Net.Http
+@inject HttpClient Http
 
-@if(assets == null)
-{
-    <p>There are no assets in the db...</p>
-}
-else
-{
-    <table>
-        <thead>
-            <tr>
-                <th></th>
-                <th>Id</th>
-                <th>Name</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var asset in assets)
-            {
-                <tr>
-                    <td>
-                        <button type="button" class="btn btn-primary px-3">
-                            <i class="oi oi-pencil"></i>
-                        </button>
-                    </td>
-                    <td>@asset.Id</td>
-                    <td>@asset.Name</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<div class="container">
+    <div class="row">
+        <h1>Asset List</h1>
+    </div>
 
-<button><span class="oi oi-plus"></span>Add New Asset</button>
+    <div class="row">
+        @if(assets == null || !assets.Any())
+        {
+            <p>There are no assets in the db...</p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Id</th>
+                        <th scope="col">Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var asset in assets)
+                    {
+                        <tr>
+                            <th scope="row">
+                                <a role="button" class="btn btn-success px-3" href="/editor/@asset.Id">
+                                    <i class="oi oi-pencil"></i>
+                                </a>
+                                <button type="button btn-danger" class="btn btn-danger px-3" @onclick="@(() => DeleteAsset(asset.Id))">
+                                    <i class="oi oi-trash"></i>
+                                </button>
+                            </th>
+                            <td>@asset.Id</td>
+                            <td>@asset.Name</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+        @if(_isCreatingAsset)
+        {
+            <div class="row justify-content-start">
+                <label for="AssetName" class="col-6">Asset Name</label>
+                <div class="w-100"></div>
+                <input type="text" id="AssetName" placeholder="Asset Name" class="col" @bind="_newAssetName"/>
+            </div>
+            <div class="row justify-content-start">
+                <button class="btn btn-secondary col-md-2" @onclick="StopCreateAsset">Cancel</button>
+                <button class="btn btn-primary col-md-2 offset-md-1" @onclick="CreateAsset"><span class="oi oi-plus"> Add</span></button>
+            </div>   
+        }
+        else 
+        {
+            <div class="row justify-content-start">     
+                <button class="btn btn-primary col-md-3" @onclick="CreatingAsset"><span class="oi oi-plus"> Add New Asset</span></button>
+            </div>
+        }
+    
+</div>
 
 @code{
     private List<Asset> assets;
+    private bool _isCreatingAsset = false;
+    private string _newAssetName = string.Empty;
+
+    private string BaseApi = @"http://localhost:8000";
+
+    protected override async Task OnInitializedAsync() =>
+        await GetAssets();
+    
+    private void CreatingAsset() => _isCreatingAsset = true;
+    private void StopCreateAsset() 
+    {
+        _isCreatingAsset = false;
+        _newAssetName = string.Empty;
+    }
+    
+    private async Task GetAssets()
+    {
+        assets = await Http.GetJsonAsync<List<Asset>>($"{BaseApi}/api/Asset");
+    }
+
+    private async Task CreateAsset()
+    {
+        Console.WriteLine("Creating new asset...");
+        if(!string.IsNullOrEmpty(_newAssetName))
+        {
+            var newAsset = new Asset { Name = _newAssetName };
+            Console.WriteLine($"Submitting {newAsset.Name}");
+            await Http.PostJsonAsync($"{BaseApi}/api/Asset", newAsset);
+            StopCreateAsset();
+            await GetAssets();
+        }
+    }
+
+    private async Task DeleteAsset(string Id)
+    {
+        Console.WriteLine($"Deleting {Id}...");
+        await Http.DeleteAsync($"{BaseApi}/api/Asset/{Id}");
+        await GetAssets();
+    }
 }
