@@ -1,26 +1,19 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Route, Switch, NavLink } from "react-router-dom";
+import AssetPage from "./components/assets/AssetPage";
+import Header from "./components/shared/Header";
 
 const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="main">
+      <Header />
+      <div className="content px-4">
+        <Switch>
+          <Route exact path="/" component={AssetPage} />
+        </Switch>
+      </div>
     </div>
   );
-}
+};
 
 export default App;

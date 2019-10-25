@@ -1,0 +1,4 @@
+export const CREATE_ASSET_SUCCESS: string = "CREATE_ASSET_SUCCESS";
+export const LOAD_ASSETS_SUCCESS: string = "LOAD_ASSETS_SUCCESS";
+export const UPDATE_ASSET_SUCCES: string = "UPDATE_ASSET_SUCCES";
+export const DELETE_ASSET_SUCCES: string = "DELETE_ASSET_SUCCES";
