@@ -1,37 +1,36 @@
-version: '3'
+version: "3"
 
-services: 
-  
+services:
   mongo:
     image: mongo:latest
     container_name: mongodb
     restart: always
     ports:
       - 27017:27017
-    volumes: 
+    volumes:
       - "mongodata:/data/db"
-  
+
   mongo-express:
     image: mongo-express
     container_name: mongo_admin
     restart: always
-    ports: 
+    ports:
       - 8081:8081
-    depends_on: 
-      - mongo  
-  
+    depends_on:
+      - mongo
+
   testapi:
     build: .
     image: testapi:latest
     restart: always
     container_name: testapi
     ports:
-      - 8000:80
-    environment: 
+      - 5010:80
+    environment:
       MongoDatabaseSettings__Host: mongo
       ASPNETCORE_ENVIRONMENT: "Development"
-    depends_on: 
+    depends_on:
       - mongo
 
-volumes: 
+volumes:
   mongodata:
